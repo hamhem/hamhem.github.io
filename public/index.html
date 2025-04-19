@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wizard Airdrop</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Chewy&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-light: #f7f7f7;
+      --bg-dark: #121212;
+      --text-light: #000;
+      --text-dark: #fff;
+      --primary: #00e5ff;
+    }
+	
+	body {
+	  margin: 0;
+	  font-family: 'Chewy', cursive;
+	  background-color: var(--bg-dark);
+	  background-image: url('background2.jpg'); /* dark mode default */
+	  background-size: cover;
+	  background-position: center;
+	  background-repeat: no-repeat;
+	  color: var(--text-dark);
+	  transition: background 0.4s, color 0.4s;
+	}
+
+	body.light {
+	  background-color: var(--bg-light);
+	  background-image: url('background.jpg'); /* light mode */
+	  color: var(--text-light);
+	}
+
+
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.4);
+      min-height: 100vh;
+      padding: 40px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    header {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .icon-button, .connect-wallet {
+      background: white;
+      border: none;
+      border-radius: 9999px;
+      padding: 10px 15px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+
+    .airdrop-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      color: inherit;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+	
+	.icon-button,
+	.connect-wallet,
+	.btn {
+	  font-family: 'Chewy', cursive;
+	}
+
+
+    .step {
+      margin: 20px 0 8px;
+      font-size: 1.2rem;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      background-color: var(--primary);
+      color: #000;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.02);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--primary);
+      color: #000;
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-family: 'Chewy', cursive;
+      font-size: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 9999;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9998;
+    }
+
+    .modal {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      padding: 25px 35px;
+      border-radius: 20px;
+      font-size: 1.3rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      animation: pop 0.3s ease-out;
+    }
+
+    body.light .modal {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+	<header>
+	  <!-- Logo on the left -->
+		<!-- Logo on the left -->
+		<div style="position: fixed; top: 0; left: 0; padding: 20px 30px; font-size: 3rem; color: white; font-family: 'Chewy', cursive; letter-spacing: 2px; text-shadow: 2px 2px 8px rgba(0, 255, 255, 0.6); z-index: 1000; background: linear-gradient(90deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%); width: 100%;" id="logo">
+		                  $WIZARD
+		</div>
+
+		<!-- Buttons on the right -->
+		<div style="position: fixed; top: 20px; right: 20px; display: flex; gap: 12px; align-items: center; z-index: 1000;">
+		  <button class="icon-button" onclick="window.open('https://www.reddit.com/r/wizardposting/', '_blank')" aria-label="Reddit">
+			<i class="fab fa-reddit-alien"></i>
+		  </button>
+		  <button class="icon-button" onclick="window.open('https://x.com/wizardonhl', '_blank')" aria-label="Twitter/X">
+			<i class="fab fa-x-twitter"></i>
+		  </button>
+			<button class="icon-button" id="themeToggle" aria-label="Toggle Theme">
+			  <i class="fas fa-moon"></i> <!-- default icon for dark mode -->
+			</button>
+		  <button class="connect-wallet" id="connectWallet">Connect Wallet</button>
+		</div>
+	</header>
+
+
+
+    <div class="airdrop-box">
+      <h2 style="font-size: 2rem;">🚀 Wizard Airdrop</h2>
+      <div class="step">0. Invite code (optional)</div>
+      <input type="text" placeholder="Enter Invite Code">
+
+      <div class="step">1. Connect your wallet</div>
+      <button class="btn" onclick="connectWallet()">Connect</button>
+
+      <div class="step">2. Share your airdrop link</div>
+      <button class="btn" onclick="walletRequired(shareLink)">Share Link</button>
+
+      <div class="step">3. Follow on X</div>
+      <button class="btn" onclick="walletRequired(() => window.open('https://x.com/wizardonhl', '_blank'))">Follow</button>
+
+      <div class="step">4. Claim your MEME tokens</div>
+      <button class="btn" onclick="walletRequired(() => alert('Claim logic here'))">Collect</button>
+    </div>
+  </div>
+
+  <div id="toast">Copied!</div>
+
+  <div id="modalBackdrop" class="modal-backdrop" onclick="hideModal()">
+    <div class="modal" onclick="event.stopPropagation()">Please connect your wallet first!</div>
+  </div>
+
+  <script>
+    let connectedWalletKey = null;
+
+    document.getElementById('connectWallet').addEventListener('click', connectWallet);
+
+    async function connectWallet() {
+      console.log("Connect button clicked");
+
+      if (window.solana?.isPhantom) {
+        try {
+          const response = await window.solana.connect();
+          const publicKey = response.publicKey.toString();
+          connectedWalletKey = publicKey;
+
+          document.getElementById('connectWallet').textContent = `${publicKey.slice(0, 5)}...${publicKey.slice(-5)}`;
+          showToast("Wallet connected");
+
+          await fetch('http://localhost:3000/wallet-connected', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ publicKey }),
+          });
+
+        } catch (err) {
+          console.error("Connection error:", err);
+          showToast("Connection failed");
+        }
+      } else {
+        showToast("Phantom not detected!");
+        window.open("https://phantom.app/", "_blank");
+      }
+    }
+
+    function walletRequired(callback) {
+      if (!connectedWalletKey) {
+        showModal();
+        return;
+      }
+      callback();
+    }
+
+    function shareLink() {
+      const link = `https://wizarddrop.com/?ref=${connectedWalletKey}`;
+      navigator.clipboard.writeText(link).then(() => {
+        showToast("Share link copied!");
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.opacity = 1;
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+
+      setTimeout(() => {
+        toast.style.opacity = 0;
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+      }, 2500);
+    }
+
+    function showModal() {
+      document.getElementById('modalBackdrop').style.display = 'flex';
+    }
+
+    function hideModal() {
+      document.getElementById('modalBackdrop').style.display = 'none';
+    }
+  </script>
+  
+  <script>
+  const toggleButton = document.getElementById('themeToggle');
+  const icon = toggleButton.querySelector('i');
+
+  toggleButton.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+
+    // Change the icon based on the new state
+    if (document.body.classList.contains('light')) {
+      icon.classList.remove('fa-moon');
+      icon.classList.add('fa-sun');
+    } else {
+      icon.classList.remove('fa-sun');
+      icon.classList.add('fa-moon');
+    }
+  });
+
+  // Optional: match system preference on load
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+    document.body.classList.add('light');
+    icon.classList.remove('fa-moon');
+    icon.classList.add('fa-sun');
+  }
+</script>
+
+</body>
+</html>
